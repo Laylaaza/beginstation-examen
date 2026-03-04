@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { createProduct } from "./actions"
 
 import AddTitle from "@/src/components/uploadPage/AddTitle"
 import UploadPicture from "@/src/components/uploadPage/UploadPicture"
@@ -20,26 +21,31 @@ export default async function UploadPage() {
     <section className="space-y-6">
       <h1 className="text-xl font-semibold">Uploaden</h1>
 
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <AddTitle />
-          <DescriptionProduct />
-          <div className="grid grid-cols-2 gap-6">
-            <AddPrice />
-            <AddCategory categories={categories} />
-          </div>
-          <AddStatusProd />
-        </div>
+      <form action={createProduct}>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <AddTitle defaultValue="" />
+            <DescriptionProduct defaultValue="" />
 
-        <div className="space-y-4">
-          <UploadPicture />
-          <AddSpecsProd />
-          <div className="grid grid-cols-2 gap-6">
-            <CancelUpload />
-            <AddUpload />
+            <div className="grid grid-cols-2 gap-6">
+              <AddPrice defaultValue="" />
+              <AddCategory categories={categories} defaultValue={undefined} />
+            </div>
+
+            <AddStatusProd defaultValue="ACTIEF" />
+          </div>
+
+          <div className="space-y-4">
+            <UploadPicture productId={undefined} />
+            <AddSpecsProd defaultValue={[]} />
+
+            <div className="grid grid-cols-2 gap-6">
+              <CancelUpload />
+              <AddUpload label="Product Aanmaken" />
+            </div>
           </div>
         </div>
-      </div>
+      </form>
     </section>
   )
 }

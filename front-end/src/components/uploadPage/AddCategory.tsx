@@ -17,10 +17,16 @@ type CategoryOption = {
 
 type AddCategoryProps = {
   categories: CategoryOption[]
+  defaultValue?: number
 }
 
-export default function AddCategory({ categories }: AddCategoryProps) {
-  const [categoryId, setCategoryId] = useState<string>("")
+export default function AddCategory({
+  categories,
+  defaultValue,
+}: AddCategoryProps) {
+  const [categoryId, setCategoryId] = useState<string>(
+    defaultValue ? String(defaultValue) : ""
+  )
 
   return (
     <Card>
@@ -28,7 +34,7 @@ export default function AddCategory({ categories }: AddCategoryProps) {
         <CardTitle className="text-sm font-medium">Categorie</CardTitle>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="space-y-2">
         <Select value={categoryId} onValueChange={setCategoryId}>
           <SelectTrigger>
             <SelectValue placeholder="Kies een categorie" />
@@ -48,6 +54,8 @@ export default function AddCategory({ categories }: AddCategoryProps) {
             )}
           </SelectContent>
         </Select>
+
+        <input type="hidden" name="categoryId" value={categoryId} />
       </CardContent>
     </Card>
   )

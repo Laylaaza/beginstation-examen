@@ -1,51 +1,70 @@
 "use client"
 
-import {useState} from "react"
-import {Card, CardHeader, CardTitle, CardContent,} from "@/src/components/ui/card"
-import {Input} from "@/src/components/ui/input"
+import { useMemo, useState } from "react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/src/components/ui/card"
+import { Input } from "@/src/components/ui/input"
 
-export default function AddSpecsProd(){
-    const [specs, setSpecs] = useState([
-        {key: "", value: ""},
-        {key: "", value: ""},
-        {key: "", value: ""},
-    ])
+type Spec = { key: string; value: string }
 
-    return(
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-sm font-medium">
-                    Specificaties
-                </CardTitle>
-            </CardHeader>
+export default function AddSpecsProd({
+  defaultValue = [],
+  rows = 3,
+}: {
+  defaultValue?: Spec[]
+  rows?: number
+}) {
+  const initial = useMemo<Spec[]>(() => {
+    const filled = defaultValue.map((s) => ({
+      key: s.key ?? "",
+      value: s.value ?? "",
+    }))
 
-            <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                    {specs.map((spec, index) => (
-                        <div key={index} className="contents">
-                        <Input
-                            value={spec.key}
-                            onChange={(e) => {
-                                const next = [...specs]
-                                next[index].key = e.target.value
-                                setSpecs(next)
-                            }}
-                            placeholder="Specificaties"
-                        />
+    while (filled.length < rows) filled.push({ key: "", value: "" })
 
-                        <Input
-                            value={spec.value}
-                            onChange={(e) => {
-                                const next = [...specs]
-                                next[index].value = e.target.value
-                                setSpecs(next)
-                            }}
-                            placeholder="Waarde"
-                        />
-                    </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
-    )
+    return filled.slice(0, rows)
+  }, [defaultValue, rows])
+
+  const [specs, setSpecs] = useState<Spec[]>(initial)
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium">Specificaties</CardTitle>
+      </CardHeader>
+
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          {specs.map((spec, index) => (
+            <div key={index} className="contents">
+              <Input
+                name="specsKey"
+                defaultValue={spec.key}
+                onChange={(e) => {
+                  const nextKey = e.target.value
+                  setSpecs((prev) =>
+                    prev.map((s, i) => (i === index ? { ...s, key: nextKey } : s))
+                  )
+                }}
+                placeholder="Specificatie"
+                autoComplete="off"
+              />
+
+              <Input
+                name="specsValue"
+                defaultValue={spec.value}
+                onChange={(e) => {
+                  const nextValue = e.target.value
+                  setSpecs((prev) =>
+                    prev.map((s, i) => (i === index ? { ...s, value: nextValue } : s))
+                  )
+                }}
+                placeholder="Waarde"
+                autoComplete="off"
+              />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
 }

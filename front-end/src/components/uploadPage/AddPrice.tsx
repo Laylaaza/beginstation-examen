@@ -1,28 +1,29 @@
 "use client"
 
-import {useState} from "react"
-import {Card, CardHeader, CardTitle, CardContent,} from "@/src/components/ui/card"
-import {Input} from "@/src/components/ui/input"
+import { Card, CardHeader, CardTitle, CardContent } from "@/src/components/ui/card"
+import { Input } from "@/src/components/ui/input"
 
-export default function AddPrice() {
-    const [price, setPrice] = useState("")
+export default function AddPrice({
+  defaultValue = "",
+}: {
+  defaultValue?: string
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium">Prijs</CardTitle>
+      </CardHeader>
 
-    return(
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-sm font-medium">
-                    Prijs
-                </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-                <Input
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="0"
-                />
-            </CardContent>
-        </Card>
-    )
+      <CardContent>
+        <Input
+          name="price"
+          type="number"
+          step="0.01"
+          defaultValue={defaultValue}
+          placeholder="0"
+          inputMode="decimal"
+        />
+      </CardContent>
+    </Card>
+  )
 }

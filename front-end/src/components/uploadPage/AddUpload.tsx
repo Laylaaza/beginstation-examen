@@ -1,11 +1,15 @@
 "use client"
 
-import {Button} from "@/src/components/ui/button"
+import { Button } from "@/src/components/ui/button"
 
-export default function AddUpload(){
-    return (
-        <Button className="w-full">
-            Product Aanmaken
-        </Button>
-    )
+export default function AddUpload({
+  label = "Product Aanmaken",
+}: {
+  label?: string
+}) {
+  return (
+    <Button type="submit" className="w-full">
+      {label}
+    </Button>
+  )
 }
