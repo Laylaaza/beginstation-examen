@@ -81,14 +81,13 @@ export async function updateProduct(formData: FormData) {
   redirect("/products")
 }
 
-export async function deleteProduct(id:number){
-  try{
-    await prisma.category.delete({
-      where: {id}
-    })
+export async function deleteProductById(id: number) {
+  if (!Number.isInteger(id)) throw new Error("Ongeldig product")
 
-    revalidatePath("/products")
-  } catch (error: any){
-    throw new Error("Product kan niet verwijderd worden")
-  }
+  await prisma.$transaction([
+    prisma.specification.deleteMany({ where: { productId: id } }),
+    prisma.product.delete({ where: { id } }),
+  ])
+
+  revalidatePath("/products")
 }

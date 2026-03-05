@@ -11,7 +11,7 @@ export default function AddTitle({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm font-medium">Naam Product</CardTitle>
+        <CardTitle className="text-sm font-medium">Naam Product (verplicht) </CardTitle>
       </CardHeader>
 
       <CardContent>

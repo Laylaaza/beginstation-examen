@@ -7,7 +7,11 @@ import { redirect } from "next/navigation"
 
 type PrismaBytes = Uint8Array<ArrayBuffer>
 
-function normaliseStatus(input: string): ProductStatus {
+type ActionState = {
+  error: string | null
+}
+
+function normaliseStatus(input: string): ProductStatus | null {
   const v = input.toLowerCase().trim()
 
   if (v === "actief") return ProductStatus.ACTIEF
@@ -18,26 +22,37 @@ function normaliseStatus(input: string): ProductStatus {
     return input as ProductStatus
   }
 
-  throw new Error("Ongeldige status")
+  return null
 }
 
-export async function createProduct(formData: FormData) {
+export async function createProduct(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const name = String(formData.get("name") ?? "").trim()
-  if (!name) throw new Error("Productnaam is verplicht")
+  if (!name) return { error: "Productnaam is verplicht" }
+
+  const seller = String(formData.get("seller") ?? "").trim()
+  if (!seller) return { error: "Verkoper is verplicht" }
 
   const descriptionRaw = formData.get("description")
   const description = descriptionRaw ? String(descriptionRaw).trim() : null
 
   const priceRaw = String(formData.get("price") ?? "").replace(",", ".").trim()
   const price = Number.parseFloat(priceRaw)
-  if (!Number.isFinite(price)) throw new Error("Prijs is ongeldig")
+  if (!Number.isFinite(price) || price <0) {
+    return{
+      error: "Prijs moet 0 of hoger zijn"
+    }
+  }
 
   const categoryIdRaw = String(formData.get("categoryId") ?? "").trim()
   const categoryId = Number.parseInt(categoryIdRaw, 10)
-  if (!Number.isInteger(categoryId)) throw new Error("Categorie is verplicht")
+  if (!Number.isInteger(categoryId)) return { error: "Categorie is verplicht" }
 
   const statusRaw = String(formData.get("status") ?? "").trim()
+
   const status = normaliseStatus(statusRaw)
+  if (!status) {
+    return { error: "Ongeldige status" }
+  }
 
   const specsKey = formData.getAll("specsKey").map((v) => String(v).trim())
   const specsValue = formData.getAll("specsValue").map((v) => String(v).trim())
@@ -56,11 +71,11 @@ export async function createProduct(formData: FormData) {
 
     if (fileLike.size > 0) {
       if (fileLike.size > 5 * 1024 * 1024) {
-        throw new Error("Afbeelding is te groot, maximaal 5MB")
+        return { error: "Afbeelding is te groot, maximaal 5MB" }
       }
 
       if (!fileLike.type?.startsWith("image/")) {
-        throw new Error("Ongeldig bestandstype")
+        return { error: "Ongeldig bestandstype" }
       }
 
       const bytes = await fileLike.arrayBuffer()
@@ -68,11 +83,21 @@ export async function createProduct(formData: FormData) {
       imageData = u8 as unknown as PrismaBytes
       imageMime = fileLike.type ?? null
     }
+
+    console.log("FORMDATA", {
+  name: formData.get("name"),
+  seller: formData.get("seller"),
+  price: formData.get("price"),
+  categoryId: formData.get("categoryId"),
+  status: formData.get("status"),
+  image: formData.get("image"),
+})
   }
 
   await prisma.product.create({
     data: {
       name,
+      seller,
       description,
       price,
       status,

@@ -22,6 +22,10 @@ export default function AddPrice({
           defaultValue={defaultValue}
           placeholder="0"
           inputMode="decimal"
+          min="0"
+          onKeyDown={(e) => {
+            if (e.key === "-") e.preventDefault()
+          }}
         />
       </CardContent>
     </Card>

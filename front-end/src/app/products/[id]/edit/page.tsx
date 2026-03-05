@@ -10,6 +10,7 @@ import AddCategory from "@/src/components/uploadPage/AddCategory"
 import AddStatusProd from "@/src/components/uploadPage/AddStatusProd"
 import CancelUpload from "@/src/components/uploadPage/CancelUpload"
 import AddUpload from "@/src/components/uploadPage/AddUpload"
+import AddSeller from "@/src/components/uploadPage/AddSeller"
 
 export default async function EditProductPage({
   params,
@@ -47,6 +48,7 @@ export default async function EditProductPage({
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-4">
             <AddTitle defaultValue={product.name} />
+            <AddSeller defaultValue={product.seller ?? ""} />
             <DescriptionProduct defaultValue={product.description ?? ""} />
 
             <div className="grid grid-cols-2 gap-6">
@@ -54,11 +56,12 @@ export default async function EditProductPage({
               <AddCategory categories={categories} defaultValue={product.categoryId} />
             </div>
 
-            <AddStatusProd defaultValue={product.status} />
+
           </div>
 
           <div className="space-y-4">
             <UploadPicture productId={product.id} />
+            <AddStatusProd defaultValue={product.status} />
             <AddSpecsProd
               defaultValue={product.specifications.map((s) => ({
                 key: s.key,
