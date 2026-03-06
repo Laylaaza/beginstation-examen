@@ -60,3 +60,22 @@ enum ProductStatus {
   DRAFT
   INACTIEF
 }
+
+model CategorySpecTemplate {
+  id         Int      @id @default(autoincrement())
+  key        String
+  sortOrder  Int      @default(0)
+
+  category   Category  @relation(fields: [categoryId], references: [id])
+  categoryId Int
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  status    CategoryStatus
+  products  Product[]
+  createdAt DateTime @default(now())
+
+  specTemplates CategorySpecTemplate[]
+}
