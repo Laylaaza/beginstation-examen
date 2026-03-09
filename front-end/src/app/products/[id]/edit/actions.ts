@@ -34,7 +34,7 @@ export async function updateProduct(formData: FormData) {
   const categoryId = Number.parseInt(String(formData.get("categoryId") ?? "").trim(), 10)
   if (!Number.isInteger(categoryId)) throw new Error("Categorie is verplicht")
 
-  const status = normaliseStatus(String(formData.get("status") ?? "").trim())
+  const status = normaliseStatus(String(formData.get("status") ?? "").trim()) 
 
   const specsKey = formData.getAll("specsKey").map((v) => String(v).trim())
   const specsValue = formData.getAll("specsValue").map((v) => String(v).trim())

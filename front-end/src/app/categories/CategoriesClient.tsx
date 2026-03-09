@@ -11,6 +11,8 @@ import CreateCategoryDialog from "../../components/modals/CreateCategoryDialog"
 import EditCategoryDialog from "@/src/components/modals/EditCategoryDialog"
 import DeleteCategoryDialog from "@/src/components/modals/DeleteCategoryDialog"
 
+//Type voor één categorie
+//Hiermee leg je vast hoe een categorie object eruit moet zien
 type Category={
     id: number
     name: string
@@ -20,11 +22,13 @@ type Category={
     }
 }
 
+//Deze component onvangt een lijst met categorieën als props
 export default function CategoriesClient({
     categories,
 }: {
     categories: Category[]
 }) {
+    //State om te bepalen of de modals open staan
     const [createOpen, setCreateOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
     const [deleteOpen, setDeleteOpen] = useState (false)
