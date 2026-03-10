@@ -39,10 +39,20 @@ export async function updateProduct(formData: FormData) {
   const specsKey = formData.getAll("specsKey").map((v) => String(v).trim())
   const specsValue = formData.getAll("specsValue").map((v) => String(v).trim())
 
-  const specifications = specsKey
-    .map((k, i) => ({ key: k, value: (specsValue[i] ?? "").trim() }))
-    .filter((s) => s.key.length > 0 && s.value.length > 0)
+  const specifications = specsKey.map((k, i) => ({
+  key: k,
+  value: (specsValue[i] ?? "").trim(),
+}))
 
+for (const spec of specifications) {
+  if ((spec.key && !spec.value) || (!spec.key && spec.value)) {
+    throw new Error("Vul bij een specificatie altijd beide velden in")
+  }
+}
+
+const validSpecifications = specifications.filter(
+  (s) => s.key.length > 0 && s.value.length > 0
+)
   const image = formData.get("image")
   let imageData: PrismaBytes | undefined = undefined
   let imageMime: string | undefined = undefined
@@ -71,7 +81,7 @@ export async function updateProduct(formData: FormData) {
       imageMime,
       specifications: {
         deleteMany: {},
-        create: specifications,
+        create: validSpecifications,
       },
     },
   })

@@ -32,6 +32,7 @@ export default function UploadFormClient({
 }) {
   const [state, formAction, isPending] = useActionState(action, { error: null })
   const [isValid, setIsValid] = useState(false)
+  const [specsValid, setSpecsValid] = useState(true)
 
   const validate = useCallback((form: HTMLFormElement) => {
     const fd = new FormData(form)
@@ -62,8 +63,10 @@ export default function UploadFormClient({
     [validate]
   )
 
-  const disabled = useMemo(() => !isValid || isPending, [isValid, isPending])
-
+  const disabled = useMemo(
+    () => !isValid || !specsValid || isPending,
+    [isValid, specsValid, isPending]
+  )
   return (
     <form action={formAction} onInput={onFormInput} onChange={onFormInput}>
       {state.error ? (
@@ -87,7 +90,7 @@ export default function UploadFormClient({
         <div className="space-y-4">
           <UploadPicture productId={undefined} />
           <AddStatusProd defaultValue="ACTIEF" />
-          <AddSpecsProd defaultValue={[]} />
+          <AddSpecsProd defaultValue={[]} onValidityChange={setSpecsValid} />
 
           <div className="grid grid-cols-2 gap-6">
             <CancelUpload />

@@ -28,6 +28,7 @@ export default function CreateCategoryDialog({
   const [name, setName] = useState("")
   const [status, setStatus] = useState<"actief" | "draft" | "inactief">("actief")
   const [loading, setLoading] = useState(false)
+  const nameValid = name.trim().length > 0
 
   async function handleCreate() {
     if (!name.trim()) return
@@ -59,6 +60,12 @@ export default function CreateCategoryDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+
+            {!nameValid && (
+              <p className="text-sm text-red-500">
+                Categorie naam is verplicht.
+              </p>
+            )}
           </div>
 
           <div className="space-y-3">
@@ -85,7 +92,7 @@ export default function CreateCategoryDialog({
             Annuleren
           </Button>
 
-          <Button onClick={handleCreate} disabled={loading}>
+          <Button onClick={handleCreate} disabled={!nameValid || loading }>
             {loading ? "Bezig..." : "Opslaan"}
           </Button>
         </DialogFooter>

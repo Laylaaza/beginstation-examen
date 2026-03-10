@@ -1,18 +1,22 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/src/components/ui/card"
 import { Input } from "@/src/components/ui/input"
 
 type Spec = { key: string; value: string }
 
+type Props = {
+  defaultValue?: Spec[]
+  rows?: number
+  onValidityChange?: (valid: boolean) => void
+}
+
 export default function AddSpecsProd({
   defaultValue = [],
   rows = 3,
-}: {
-  defaultValue?: Spec[]
-  rows?: number
-}) {
+  onValidityChange,
+}: Props) {
   const initial = useMemo<Spec[]>(() => {
     const filled = defaultValue.map((s) => ({
       key: s.key ?? "",
@@ -26,6 +30,24 @@ export default function AddSpecsProd({
 
   const [specs, setSpecs] = useState<Spec[]>(initial)
 
+  const hasIncompleteSpec = specs.some(
+    (spec) =>
+      (spec.key.trim() !== "" && spec.value.trim() === "") ||
+      (spec.key.trim() === "" && spec.value.trim() !== "")
+  )
+
+  useEffect(() => {
+    const valid = !hasIncompleteSpec
+
+    onValidityChange?.(valid)
+
+    window.dispatchEvent(
+      new CustomEvent("specs-validity-change", {
+        detail: { valid },
+      })
+    )
+  }, [hasIncompleteSpec, onValidityChange])
+
   return (
     <Card>
       <CardHeader>
@@ -38,7 +60,7 @@ export default function AddSpecsProd({
             <div key={index} className="contents">
               <Input
                 name="specsKey"
-                defaultValue={spec.key}
+                value={spec.key}
                 onChange={(e) => {
                   const nextKey = e.target.value
                   setSpecs((prev) =>
@@ -51,7 +73,7 @@ export default function AddSpecsProd({
 
               <Input
                 name="specsValue"
-                defaultValue={spec.value}
+                value={spec.value}
                 onChange={(e) => {
                   const nextValue = e.target.value
                   setSpecs((prev) =>
@@ -64,6 +86,12 @@ export default function AddSpecsProd({
             </div>
           ))}
         </div>
+
+        {hasIncompleteSpec && (
+          <p className="mt-2 text-sm text-red-500">
+            Vul bij een specificatie altijd beide velden in.
+          </p>
+        )}
       </CardContent>
     </Card>
   )

@@ -42,16 +42,23 @@ export default function ProductSpecificView({ product }: Props) {
       : ""
 
   return (
-    <section className="space-y-6">
-      <h1 className="text-xl font-semibold">Product Specificaties</h1>
+    <section className="space-y-8">
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Product specificaties</h1>
+        <p className="text-sm text-muted-foreground">
+          Bekijk hier alle productinformatie in een duidelijk overzicht.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <ReadField label="Titel product" value={product.name} />
-          <ReadField label="Naam Verkoper" value={product.seller} />
-          <ReadField label="Beschrijving product" value={product.description} />
+      <div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
+        <div className="rounded-2xl border bg-white p-6 shadow-sm space-y-6">
+          <div className="grid gap-5">
+            <ReadField label="Titel product" value={product.name} />
+            <ReadField label="Naam verkoper" value={product.seller} />
+            <ReadField label="Beschrijving product" value={product.description} large />
+          </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid gap-5 sm:grid-cols-2">
             <ReadField label="Prijs" value={`€${formatPrice(product.price)}`} />
             <ReadField label="Categorie" value={product.categoryName} />
           </div>
@@ -59,50 +66,56 @@ export default function ProductSpecificView({ product }: Props) {
           <ReadField label="Status" value={statusLabel} />
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Afbeelding product</p>
+        <div className="space-y-6">
+          <div className="rounded-2xl border bg-white p-6 shadow-sm">
+            <p className="mb-3 text-sm font-medium text-muted-foreground">
+              Afbeelding product
+            </p>
 
-            <div className="rounded-xl border bg-white p-6 max-w-md">
-                <div className="mx-auto flex items-center justify-center h-40 w-40 overflow-hidden rounded-md bg-white">
-                {imageSrc ? (
-                    <img
-                    src={imageSrc}
-                    alt={product.name}
-                    className="max-h-full max-w-full object-contain"
-                    onError={(e) => {
-                        ;(e.currentTarget as HTMLImageElement).src =
-                        "/products/placeholder.png"
-                    }}
-                    />
-                ) : (
-                  <div className="text-sm text-muted-foreground">
-                    Geen afbeelding
-                  </div>
-                )}
-              </div>
+            <div className="flex min-h-[260px] items-center justify-center rounded-2xl border bg-muted/20 p-6">
+              {imageSrc ? (
+                <img
+                  src={imageSrc}
+                  alt={product.name}
+                  className="max-h-64 w-auto max-w-full object-contain"
+                  onError={(e) => {
+                    ;(e.currentTarget as HTMLImageElement).src =
+                      "/products/placeholder.png"
+                  }}
+                />
+              ) : (
+                <div className="text-sm text-muted-foreground">Geen afbeelding</div>
+              )}
             </div>
           </div>
 
-          {product.specifications.length > 0 ? (
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Specificaties</p>
+          <div className="rounded-2xl border bg-white p-6 shadow-sm">
+            <p className="mb-3 text-sm font-medium text-muted-foreground">
+              Specificaties
+            </p>
 
-              <div className="rounded-xl border bg-white p-4">
-                <div className="space-y-2">
-                  {product.specifications.map((s) => (
-                    <div key={s.id} className="text-sm">
-                      <span className="font-medium">{s.key}</span>
-                      <span>: </span>
-                      <span>{s.value}</span>
-                    </div>
-                  ))}
-                </div>
+            {product.specifications.length > 0 ? (
+              <div className="space-y-3">
+                {product.specifications.map((s) => (
+                  <div
+                    key={s.id}
+                    className="flex items-start justify-between gap-4 rounded-xl border bg-muted/20 px-4 py-3"
+                  >
+                    <span className="text-sm font-medium">{s.key}</span>
+                    <span className="text-sm text-muted-foreground text-right">
+                      {s.value}
+                    </span>
+                  </div>
+                ))}
               </div>
-            </div>
-          ) : null}
+            ) : (
+              <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                Geen specificaties toegevoegd.
+              </div>
+            )}
+          </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             <Button type="button" variant="outline" onClick={() => router.back()}>
               Annuleren
             </Button>
@@ -111,7 +124,7 @@ export default function ProductSpecificView({ product }: Props) {
               type="button"
               onClick={() => router.push(`/products/${product.id}/edit`)}
             >
-              Product Bewerken
+              Product bewerken
             </Button>
           </div>
         </div>
@@ -120,11 +133,23 @@ export default function ProductSpecificView({ product }: Props) {
   )
 }
 
-function ReadField({ label, value }: { label: string; value: string }) {
+function ReadField({
+  label,
+  value,
+  large = false,
+}: {
+  label: string
+  value: string
+  large?: boolean
+}) {
   return (
     <div className="space-y-2">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <div className="rounded-xl border bg-white px-4 py-3 text-sm">
+      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <div
+        className={`rounded-xl border bg-muted/20 px-4 py-3 text-sm ${
+          large ? "min-h-[110px]" : ""
+        }`}
+      >
         {value || "-"}
       </div>
     </div>
@@ -132,5 +157,5 @@ function ReadField({ label, value }: { label: string; value: string }) {
 }
 
 function formatPrice(price: number) {
-  return price.toFixed(0)
+  return price.toFixed(2).replace(".", ",")
 }

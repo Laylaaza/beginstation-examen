@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/src/components/ui/card"
 import { Input } from "@/src/components/ui/input"
 
@@ -8,6 +9,8 @@ export default function AddPrice({
 }: {
   defaultValue?: string
 }) {
+  const [price, setPrice] = useState(defaultValue.replace(",", "."))
+
   return (
     <Card>
       <CardHeader>
@@ -17,12 +20,17 @@ export default function AddPrice({
       <CardContent>
         <Input
           name="price"
-          type="number"
-          step="0.01"
-          defaultValue={defaultValue}
+          type="text"
+          value={price}
           placeholder="0"
           inputMode="decimal"
-          min="0"
+          onChange={(e) => {
+            const value = e.target.value.replace(",", ".")
+
+            if (/^\d*\.?\d{0,2}$/.test(value)) {
+              setPrice(value)
+            }
+          }}
           onKeyDown={(e) => {
             if (e.key === "-") e.preventDefault()
           }}
