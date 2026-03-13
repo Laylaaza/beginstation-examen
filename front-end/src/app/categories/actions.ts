@@ -48,20 +48,6 @@ export async function createCategory(data: {
   }
 }
 
-//Server action om een categorie uit de database te verwijderen.
-export async function deleteCategory(id: number) {
-  try {
-    //Prisma query die de categorie verwijdert op basis van het id
-    //Het id is de unieke identifier van de categorie
-    await prisma.category.delete({
-      where: { id },
-    })
-
-    revalidatePath("/categories")
-  } catch (error: any) {
-    throw new Error("Categorie kan niet verwijderd worden")
-  }
-}
 
 //Server action om een bestaande categorie te bewerken
 export async function updateCategory(data: {

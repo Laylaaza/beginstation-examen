@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { deleteCategory } from "@/src/app/categories/actions"
+//import { deleteCategory } from "@/src/app/categories/actions"
 import { AlertTriangle } from "lucide-react"
 
 import {
@@ -35,7 +35,7 @@ export default function DeleteCategoryDialog({
 
     try {
       setLoading(true)
-      await deleteCategory(category.id)
+      //await deleteCategory(category.id)
       onOpenChange(false)
     } finally {
       setLoading(false)

@@ -5,27 +5,20 @@ import { ProductStatus } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
+//Speciaal type dat gebruikt wordt om binaire data (zoals een afbeelding) op te slaan
 type PrismaBytes = Uint8Array<ArrayBuffer>
 
+//Type voor de status van de actie
+//Hiermee kan een foutmelding worden teruggeven aan het formulier
 type ActionState = {
   error: string | null
 }
 
-function normaliseStatus(input: string): ProductStatus | null {
-  const v = input.toLowerCase().trim()
+export async function createProduct(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
 
-  if (v === "actief") return ProductStatus.ACTIEF
-  if (v === "draft") return ProductStatus.DRAFT
-  if (v === "inactief") return ProductStatus.INACTIEF
-
-  if (input === "ACTIEF" || input === "DRAFT" || input === "INACTIEF") {
-    return input as ProductStatus
-  }
-
-  return null
-}
-
-export async function createProduct(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const name = String(formData.get("name") ?? "").trim()
   if (!name) return { error: "Productnaam is verplicht" }
 
@@ -37,9 +30,9 @@ export async function createProduct(prevState: ActionState, formData: FormData):
 
   const priceRaw = String(formData.get("price") ?? "").replace(",", ".").trim()
   const price = Number.parseFloat(priceRaw)
-  if (!Number.isFinite(price) || price <0) {
-    return{
-      error: "Prijs moet 0 of hoger zijn"
+  if (!Number.isFinite(price) || price < 0) {
+    return {
+      error: "Prijs moet 0 of hoger zijn",
     }
   }
 
@@ -49,16 +42,24 @@ export async function createProduct(prevState: ActionState, formData: FormData):
 
   const statusRaw = String(formData.get("status") ?? "").trim()
 
-  const status = normaliseStatus(statusRaw)
-  if (!status) {
+  if (
+    statusRaw !== "ACTIEF" &&
+    statusRaw !== "DRAFT" &&
+    statusRaw !== "INACTIEF"
+  ) {
     return { error: "Ongeldige status" }
   }
+
+  const status: ProductStatus = statusRaw
 
   const specsKey = formData.getAll("specsKey").map((v) => String(v).trim())
   const specsValue = formData.getAll("specsValue").map((v) => String(v).trim())
 
   const specifications = specsKey
-    .map((k, i) => ({ key: k, value: (specsValue[i] ?? "").trim() }))
+    .map((k, i) => ({
+      key: k,
+      value: (specsValue[i] ?? "").trim(),
+    }))
     .filter((s) => s.key.length > 0 && s.value.length > 0)
 
   const image = formData.get("image")
@@ -83,15 +84,6 @@ export async function createProduct(prevState: ActionState, formData: FormData):
       imageData = u8 as unknown as PrismaBytes
       imageMime = fileLike.type ?? null
     }
-
-    console.log("FORMDATA", {
-  name: formData.get("name"),
-  seller: formData.get("seller"),
-  price: formData.get("price"),
-  categoryId: formData.get("categoryId"),
-  status: formData.get("status"),
-  image: formData.get("image"),
-})
   }
 
   await prisma.product.create({
@@ -104,7 +96,9 @@ export async function createProduct(prevState: ActionState, formData: FormData):
       categoryId,
       imageData,
       imageMime,
-      specifications: specifications.length ? { create: specifications } : undefined,
+      specifications: specifications.length
+        ? { create: specifications }
+        : undefined,
     },
   })
 

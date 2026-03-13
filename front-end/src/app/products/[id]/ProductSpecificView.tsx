@@ -24,15 +24,16 @@ type Props = {
   }
 }
 
+const statusLabels = {
+  ACTIEF: "Actief",
+  DRAFT: "Draft",
+  INACTIEF: "Inactief",
+} as const
+
 export default function ProductSpecificView({ product }: Props) {
   const router = useRouter()
 
-  const statusLabel =
-    product.status === "ACTIEF"
-      ? "Actief"
-      : product.status === "DRAFT"
-        ? "Draft"
-        : "Inactief"
+  const statusLabel = statusLabels[product.status]
 
   const imageUrl = product.imageUrl?.trim()
   const imageSrc = imageUrl
